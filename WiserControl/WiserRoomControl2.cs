@@ -158,15 +158,18 @@ namespace WiserControl
         {
             var worstStatus = BatteryStatus.Normal;
 
-            foreach (int id in _room.SmartValveIds)
+            if (_room.SmartValveIds != null)
             {
-                var device = Program.MainForm.GetDeviceById(id);
-                if (device != null)
+                foreach (int id in _room.SmartValveIds)
                 {
-                    BatteryStatus status;
-                    if (Enum.TryParse(device.BatteryLevel, out status))
-                        if (status < worstStatus)
-                            worstStatus = status;
+                    var device = Program.MainForm.GetDeviceById(id);
+                    if (device != null)
+                    {
+                        BatteryStatus status;
+                        if (Enum.TryParse(device.BatteryLevel, out status))
+                            if (status < worstStatus)
+                                worstStatus = status;
+                    }
                 }
             }
 
