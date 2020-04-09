@@ -1,4 +1,9 @@
 # Wiser
+
+![GitHub Actions Build](https://github.com/Rammesses/Drayton-Wiser/workflows/.NET%20Core/badge.svg)
+
+Forked from [davejgandy/Drayton-Wiser](https://github.com/davejgandy/Drayton-Wiser), and updated to NetStandard 2.0 / Net472 / NetCore 3.1.
+
 ## Control interface for Drayton Wiser 
 
 Designed to create a standalone control interface for Drayton Wiser Heating control, running on a windows tablet, but obviously will run on a PC as well.
