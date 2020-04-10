@@ -5,15 +5,18 @@ using System.Text;
 using LiteDB;
 using Wiser.DataObjects;
 using System.IO;
+using Wiser;
+using Wiser.DataLogger;
 
 namespace WiserMonitor
 {
-    public class DataLogger
+    public class LiteDbDataLogger : IDataLogger
     {
         private string GetDBPath()
         {
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WiserData.ldb");
         }
+
         public void WriteValveData(HeatHub hub)
         {
             try

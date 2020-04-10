@@ -16,17 +16,17 @@ namespace WiserControl
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private HeatHub _hub;
-        private DataLogger _dataLogger;
+        private LiteDbDataLogger _dataLogger;
         private DateTime _lastLogTime;
         public MainForm()
         {
             InitializeComponent();
-            _dataLogger = new WiserMonitor.DataLogger();
+            _dataLogger = new WiserMonitor.LiteDbDataLogger();
             statusMessageLabel.BackColor = timeLabel.BackColor;
             statusMessageLabel.ForeColor = timeLabel.ForeColor;
         }
 
-        public DataLogger DataLogger { get { return _dataLogger; } }
+        public LiteDbDataLogger DataLogger { get { return _dataLogger; } }
 
         private void button1_Click(object sender, EventArgs e)
         {

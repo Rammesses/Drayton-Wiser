@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WiserMonitor\WiserMonitor.csproj" />
+    <ProjectReference Include="..\WiserMonitor\WiserMonitor.LiteDb.csproj" />
     <ProjectReference Include="..\Wiser\Wiser.csproj" />
   </ItemGroup>
 
