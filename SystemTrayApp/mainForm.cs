@@ -28,7 +28,7 @@ namespace WiserSystemTrayApp
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            _connection = new WiserConnection();
+            _connection = new WiserConnection(WiserConnectionOptions.Default);
             notifyIcon1.ShowBalloonTip(500, this.Text, "Connected to Heat Hub", ToolTipIcon.Info);
 
         }

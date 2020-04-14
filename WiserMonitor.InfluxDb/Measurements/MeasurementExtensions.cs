@@ -1,4 +1,5 @@
-﻿using Wiser.DataLogger;
+﻿using System;
+using Wiser.DataLogger;
 
 namespace WiserMonitor.InfluxDb.Measurements
 {
@@ -9,11 +10,12 @@ namespace WiserMonitor.InfluxDb.Measurements
             var measurement = new RoomDataMeasurement()
             {
                 Id = roomData.Id,
+                Host = Environment.MachineName,
                 Name = roomData.Name,
                 Temperature = roomData.CalculatedTemperature,
                 SetPoint = roomData.CurrentSetPoint,
                 Demand = roomData.PercentageDemand,
-                TimeStamp = roomData.DataDate
+                TimeStamp = new DateTime(roomData.DataDate.Ticks, DateTimeKind.Utc)
             };
 
             return measurement;

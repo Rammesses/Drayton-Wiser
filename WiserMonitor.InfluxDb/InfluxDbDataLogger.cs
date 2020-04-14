@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using InfluxDB.Client;
 using WiserMonitor.InfluxDb.Measurements;
 using InfluxDB.Client.Api.Domain;
+using InfluxDB.Client.Writes;
 
 namespace WiserMonitor.InfluxDb
 {
@@ -16,8 +17,9 @@ namespace WiserMonitor.InfluxDb
 
         public InfluxDbDataLogger(IOptions<InfluxDbDataLoggerOptions> options)
         {
-            this.options = options.Value;
-            this.client = InfluxDBClientFactory.Create(this.options.ConnectionString);
+            this.options = options.Value;            
+
+            this.client = InfluxDBClientFactory.Create(this.options.ConnectionString, this.options.Token.ToCharArray());
         }
 
         public List<RoomData> GetRoomData(string roomName, DateTime startDate, DateTime endDate)
@@ -31,18 +33,18 @@ namespace WiserMonitor.InfluxDb
             {
                 foreach (var room in hub.Room)
                 {
-                    var newData = new RoomData
-                    {
-                        id = room.id,
-                        DataDate = DateTime.Now,
-                        Name = room.Name,
-                        CalculatedTemperature = room.CalculatedTemperature,
-                        CurrentSetPoint = room.CurrentSetPoint,
-                        PercentageDemand = room.PercentageDemand
-                    };
+                    var newData = PointData.Measurement("temp")
+                        .Tag("room", room.Name)
+                        .Tag("host", Environment.MachineName.ToLowerInvariant())
+                        .Field("calc_temp", room.CalculatedTemperature)
+                        .Field("set_temp", room.CurrentSetPoint)
+                        .Field("demand", room.PercentageDemand)
+                        .Timestamp(DateTime.UtcNow.Ticks, WritePrecision.S);
 
-                    writeApi.WriteMeasurement(WritePrecision.S, newData.AsMeasurement());
+                    writeApi.WritePoint(this.options.BucketId, this.options.OrgId, newData);
                 }
+
+                writeApi.Flush();
             }
         }
 

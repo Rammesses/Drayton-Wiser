@@ -20,7 +20,7 @@ namespace WiserControl
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            wiserConnection = new WiserConnection();
+            wiserConnection = new WiserConnection(WiserConnectionOptions.Default);
             _mainForm = new MainForm();
             Application.Run(_mainForm);
         }

@@ -8,6 +8,9 @@ namespace WiserMonitor.InfluxDb.Measurements
     {
         public Guid Id { get; internal set; }
 
+        [Column("host", IsTag = true)]
+        public string Host { get; internal set; }
+
         [Column("room", IsTag = true)]
         public string Name { get; internal set; }
 

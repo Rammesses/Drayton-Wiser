@@ -12,26 +12,28 @@ using Wiser.DataObjects;
 using System.Threading;
 using System.Configuration;
 using System.Reflection;
+using Microsoft.Extensions.Options;
 
 namespace Wiser
 {
-    public class WiserConnection
+    public class WiserConnection : IWiserDataProvider
     {
         private string _hubIP;
         private string _hubSecret;
         protected HeatHub _hub;
 
-        public WiserConnection()
+        public WiserConnection(IOptions<WiserConnectionOptions> optionSnapshot)
         {
-            var config = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location);
-
-            if (config.HasFile)
-            {
-                _hubIP = config.AppSettings.Settings["HubAddress"].Value;
-                _hubSecret = config.AppSettings.Settings["HubSecret"].Value;
-            }
+            var options = optionSnapshot.Value;
+            this._hubIP = options.HubIPAddress;
+            this._hubSecret = options.HubSecret;
         }
 
+        internal WiserConnection(WiserConnectionOptions options)
+        {
+            this._hubIP = options.HubIPAddress;
+            this._hubSecret = options.HubSecret;
+        }
 
         public string GetDataJSON()
         {
