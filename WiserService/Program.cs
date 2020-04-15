@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,35 +17,46 @@ namespace WiserService
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseWindowsService()
-                .ConfigureServices((hostContext, services) =>
-                {
-                    var config = hostContext.Configuration;
+        public static IHostBuilder CreateHostBuilder(string[] args) {
 
-                    services.AddWiser(options => 
-                    {
-                        var section = config.GetSection("Wiser");
+            var hostBuilder = Host.CreateDefaultBuilder(args);
 
-                        options.HubIPAddress = section["HubIpAddress"];
-                        options.HubSecret = section["HubSecret"];
-                    });
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                hostBuilder.UseWindowsService();
+            }
 
-                    //services.AddDataLogger<LiteDbDataLogger>();
-                    services.AddDataLogger<InfluxDbDataLogger, InfluxDbDataLoggerOptions>(options =>
-                    {
-                        var section = config.GetSection("InfluxDb");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                hostBuilder.UseSystemd();
+            }
 
-                        options.ConnectionString = section["ConnectionString"];
-                        options.Token = section["Token"];
-                        options.BucketId = section["BucketId"];
-                        options.OrgId = section["OrgId"];
-                    });
+            hostBuilder.ConfigureServices((hostContext, services) => {
+                var config = hostContext.Configuration;
 
-                    services.AddMediatR(typeof(Startup).Assembly);
+                services.AddWiser(options => {
+                    var section = config.GetSection("Wiser");
 
-                    services.AddHostedService<DataLoggerTimerWorker>();
+                    options.HubIPAddress = section["HubIpAddress"];
+                    options.HubSecret = section["HubSecret"];
                 });
+
+                //services.AddDataLogger<LiteDbDataLogger>();
+                services.AddDataLogger<InfluxDbDataLogger, InfluxDbDataLoggerOptions>(options => {
+                    var section = config.GetSection("InfluxDb");
+
+                    options.ConnectionString = section["ConnectionString"];
+                    options.Token = section["Token"];
+                    options.BucketId = section["BucketId"];
+                    options.OrgId = section["OrgId"];
+                });
+
+                services.AddMediatR(typeof(Startup).Assembly);
+
+                services.AddHostedService<DataLoggerTimerWorker>();
+            });
+
+            return hostBuilder;
+        }
     }
 }

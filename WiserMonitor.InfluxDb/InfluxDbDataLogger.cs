@@ -36,10 +36,10 @@ namespace WiserMonitor.InfluxDb
                     var newData = PointData.Measurement("temp")
                         .Tag("room", room.Name)
                         .Tag("host", Environment.MachineName.ToLowerInvariant())
-                        .Field("calc_temp", room.CalculatedTemperature)
-                        .Field("set_temp", room.CurrentSetPoint)
+                        .Field("calc_temp", (room.CalculatedTemperature / 10.0))
+                        .Field("set_temp", (room.CurrentSetPoint / 10.0))
                         .Field("demand", room.PercentageDemand)
-                        .Timestamp(DateTime.UtcNow.Ticks, WritePrecision.S);
+                        .Timestamp(DateTime.UtcNow, WritePrecision.S);
 
                     writeApi.WritePoint(this.options.BucketId, this.options.OrgId, newData);
                 }
