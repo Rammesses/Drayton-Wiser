@@ -23,3 +23,11 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+    - name: Package
+      run: mkdir -p ~/out
+           dotnet publish --configuration Release --no-restore -o ~/out
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Drayton.Wiser.Zip 
+        path: ~/out  
