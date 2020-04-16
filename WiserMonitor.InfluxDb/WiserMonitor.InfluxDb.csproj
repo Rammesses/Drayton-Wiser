@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="InfluxDb.Client" Version="1.6.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.3" />
   </ItemGroup>
 
   <ItemGroup>

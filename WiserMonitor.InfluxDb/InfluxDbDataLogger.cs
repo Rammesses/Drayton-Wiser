@@ -2,23 +2,26 @@
 using System;
 using Wiser.DataLogger;
 using Wiser.DataObjects;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using InfluxDB.Client;
 using WiserMonitor.InfluxDb.Measurements;
 using InfluxDB.Client.Api.Domain;
-using InfluxDB.Client.Writes;
 
 namespace WiserMonitor.InfluxDb
 {
     public class InfluxDbDataLogger : IDataLogger
     {
         private readonly InfluxDbDataLoggerOptions options;
+        private readonly ILogger logger;
         private readonly InfluxDBClient client;
 
-        public InfluxDbDataLogger(IOptions<InfluxDbDataLoggerOptions> options)
+        public InfluxDbDataLogger(
+            IOptions<InfluxDbDataLoggerOptions> options,
+            ILogger<InfluxDbDataLogger> logger)
         {
-            this.options = options.Value;            
-
+            this.options = options.Value;
+            this.logger = logger;
             this.client = InfluxDBClientFactory.Create(this.options.ConnectionString, this.options.Token.ToCharArray());
         }
 
@@ -33,15 +36,13 @@ namespace WiserMonitor.InfluxDb
             {
                 foreach (var room in hub.Room)
                 {
-                    var newData = PointData.Measurement("temp")
-                        .Tag("room", room.Name)
-                        .Tag("host", Environment.MachineName.ToLowerInvariant())
-                        .Field("calc_temp", (room.CalculatedTemperature / 10.0))
-                        .Field("set_temp", (room.CurrentSetPoint / 10.0))
-                        .Field("demand", room.PercentageDemand)
-                        .Timestamp(DateTime.UtcNow, WritePrecision.S);
+                    if (room.CalculatedTemperature < -1000.0)
+                    {
+                        this.logger.LogWarning("{roomName} is not reporting temperature ({reportedTemp}/{alexaTemp}).", room.Name, room.CalculatedTemperature, room.RoundedAlexaTemperature);
+                        continue;
+                    }
 
-                    writeApi.WritePoint(this.options.BucketId, this.options.OrgId, newData);
+                    writeApi.WriteMeasurement(this.options.BucketId, this.options.OrgId, WritePrecision.S, room.AsRoomDataMeasurement());
                 }
 
                 writeApi.Flush();
